@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import axios from 'axios';
 import { requireAuth } from '@/lib/security/auth-utils';
 import { secrets } from '@/lib/secrets';
+import { withCSRFSecurity } from '@/lib/security/middleware';
+
 const API_KEY_PEAMSUB = secrets.API_KEY_PEAMSUB;
 const API_URL_PEAMSUB = "https://api.peamsub24hr.com/v2";
 
@@ -11,7 +13,7 @@ function createAuthHeader(apiKey: string): string {
     return `Basic ${base64Key}`;
 }
 
-export async function POST(request: NextRequest) {
+async function handlePreorderHistory(request: NextRequest) {
     try {
         // Verify authentication (supports both cookies and Authorization header)
         const authResult = await requireAuth(request);
@@ -80,4 +82,3 @@ export async function POST(request: NextRequest) {
 
 // Export with CSRF protection and rate limiting
 export const POST = withCSRFSecurity(handlePreorderHistory);
-
