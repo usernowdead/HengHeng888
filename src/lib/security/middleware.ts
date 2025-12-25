@@ -127,6 +127,3 @@ export function withCSRFSecurity(
   return withCSRFProtection(securedHandler);
 }
 
-// Explicit export to ensure module resolution
-export { withCSRFSecurity as default };
-
