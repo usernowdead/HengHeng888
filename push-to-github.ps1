@@ -9,29 +9,22 @@ if (-not (Test-Path ".git")) {
     git init
 }
 
-# Ask for GitHub username
-$username = Read-Host "Enter your GitHub username"
-if ([string]::IsNullOrWhiteSpace($username)) {
-    Write-Host "❌ Username is required!" -ForegroundColor Red
-    exit 1
-}
+# Pre-configured for usernowdead
+$username = "usernowdead"
+$email = "chanathip302010@gmail.com"
+
+# Set git config
+git config user.name $username
+git config user.email $email
+Write-Host "✅ Git config set:" -ForegroundColor Green
+Write-Host "   Username: $username" -ForegroundColor Cyan
+Write-Host "   Email: $email" -ForegroundColor Cyan
 
 # Ask for repository name
-$repoName = Read-Host "Enter repository name (default: oho568)"
+$repoName = Read-Host "`nEnter repository name (default: oho568)"
 if ([string]::IsNullOrWhiteSpace($repoName)) {
     $repoName = "oho568"
 }
-
-# Ask for email (optional)
-$email = Read-Host "Enter your email (optional, press Enter to skip)"
-if (-not [string]::IsNullOrWhiteSpace($email)) {
-    git config user.email $email
-    Write-Host "✅ Email set to: $email" -ForegroundColor Green
-}
-
-# Set username
-git config user.name $username
-Write-Host "✅ Username set to: $username" -ForegroundColor Green
 
 # Add all files
 Write-Host "`n📦 Adding files..." -ForegroundColor Yellow
