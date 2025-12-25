@@ -4,25 +4,12 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  // @ts-ignore
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
   // Performance optimizations
   compress: true,
   poweredByHeader: false,
   reactStrictMode: true,
   
   images: {
-    domains: [
-      'img5.pic.in.th',
-      'gafiwshop.xyz',
-      'playzaa.online',
-      'www.oned.net',
-      'richmanshop.com',
-      'www.termgame24.com',
-      'apiportal.kasikornbank.com',
-    ],
     remotePatterns: [
       {
         protocol: 'https',
