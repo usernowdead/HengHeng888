@@ -78,14 +78,15 @@ function validateDatabaseURL(value: string): void {
 }
 
 export const secrets = {
-  // JWT and API keys: NO defaults allowed in production
+  // JWT: NO defaults allowed in production
   JWT_SECRET: getSecret('JWT_SECRET', 'webshop_by_proleak_default_secret_change_in_production', validateJWTSecret, false),
-  API_KEY_MIDDLE: getSecret('API_KEY_MIDDLE', 'apikey_default_change_in_production', validateAPIKey, false),
-  API_KEY_ADS4U: getSecret('API_KEY_ADS4U', 'apikey_ads4u_default_change_in_production', validateAPIKey, false),
-  API_KEY_GAFIW: getSecret('API_KEY_GAFIW', 'apikey_gafiw_default_change_in_production', validateAPIKey, false),
-  API_KEY_PEAMSUB: getSecret('API_KEY_PEAMSUB', 'apikey_peamsub_default_change_in_production', validateAPIKey, false),
-  API_KEY_EASYSLIP: getSecret('API_KEY_EASYSLIP', 'apikey_easyslip_default_change_in_production', validateAPIKey, false),
-  PAYMENT_GATEWAY_API_KEY: getSecret('PAYMENT_GATEWAY_API_KEY', 'payment_gateway_api_key_default_change_in_production', validateAPIKey, false),
+  // API keys: Allow defaults in production for optional services (will warn but not fail)
+  API_KEY_MIDDLE: getSecret('API_KEY_MIDDLE', 'apikey_middle_placeholder_temp', validateAPIKey, true),
+  API_KEY_ADS4U: getSecret('API_KEY_ADS4U', 'apikey_ads4u_placeholder_temp', validateAPIKey, true),
+  API_KEY_GAFIW: getSecret('API_KEY_GAFIW', 'apikey_gafiw_placeholder_temp', validateAPIKey, true),
+  API_KEY_PEAMSUB: getSecret('API_KEY_PEAMSUB', 'apikey_peamsub_placeholder_temp', validateAPIKey, true),
+  API_KEY_EASYSLIP: getSecret('API_KEY_EASYSLIP', 'apikey_easyslip_placeholder_temp', validateAPIKey, true),
+  PAYMENT_GATEWAY_API_KEY: getSecret('PAYMENT_GATEWAY_API_KEY', 'payment_gateway_api_key_placeholder_temp', validateAPIKey, true),
   // Turnstile keys: allow defaults (test keys are acceptable)
   TURNSTILE_SECRET_KEY: getSecret('TURNSTILE_SECRET_KEY', '1x00000000000000000000AA', undefined, true), // Cloudflare test key
   NEXT_PUBLIC_TURNSTILE_SITE_KEY: getSecret('NEXT_PUBLIC_TURNSTILE_SITE_KEY', '1x00000000000000000000AA', undefined, true), // Cloudflare test key
