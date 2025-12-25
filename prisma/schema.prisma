@@ -1,0 +1,124 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              String    @id @default(uuid()) @db.Text
+  username        String    @unique @db.Text
+  email           String    @unique @db.Text
+  password        String    @db.Text
+  role            Int       @default(0)
+  profile         String?   @map("profile_url") @db.Text
+  balance         Decimal   @default(0) @db.Decimal(10, 2)
+  twoFactorEnabled Boolean  @default(false) @map("two_factor_enabled")
+  twoFactorSecret String?   @map("two_factor_secret") @db.Text
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamp(3)
+  updatedAt       DateTime  @updatedAt @map("updated_at") @db.Timestamp(3)
+
+  orders          Order[]
+  transactions    Transaction[]
+
+  @@map("users")
+}
+
+model Order {
+  id              String    @id @default(uuid()) @db.Text
+  userId          String    @map("user_id") @db.Text
+  productId       String    @map("product_id") @db.Text
+  type            String    @db.Text
+  reference       String?   @db.Text
+  transactionId   String?   @map("transaction_id") @db.Text
+  state           String    @default("pending") @db.Text
+  price           Decimal   @db.Decimal(10, 2)
+  data            String?   @db.Text
+  productMetadata Json?     @map("product_metadata")
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamp(3)
+  updatedAt       DateTime  @updatedAt @map("updated_at") @db.Timestamp(3)
+
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions    Transaction[]
+
+  @@index([userId])
+  @@index([state])
+  @@index([type])
+  @@index([createdAt])
+  @@map("orders")
+}
+
+model Transaction {
+  id          String    @id @default(uuid()) @db.Text
+  userId      String    @map("user_id") @db.Text
+  orderId     String?   @map("order_id") @db.Text
+  type        String    @db.Text
+  amount      Decimal   @db.Decimal(10, 2)
+  balanceBefore Decimal  @map("balance_before") @db.Decimal(10, 2)
+  balanceAfter  Decimal  @map("balance_after") @db.Decimal(10, 2)
+  description String?   @db.Text
+  note        String?   @db.Text
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamp(3)
+
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  order       Order?    @relation(fields: [orderId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([orderId])
+  @@index([type])
+  @@index([createdAt])
+  @@map("transactions")
+}
+
+model QRSession {
+  id        String    @id @default(uuid()) @db.Text
+  sessionId String    @unique @map("session_id") @db.Text
+  userId    String?   @map("user_id") @db.Text
+  status    String    @default("pending") @db.Text
+  expiresAt DateTime  @map("expires_at") @db.Timestamp(3)
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp(3)
+  updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamp(3)
+
+  @@index([sessionId])
+  @@index([status])
+  @@index([expiresAt])
+  @@map("qr_sessions")
+}
+
+model Movie {
+  id        String   @id @default(dbgenerated("gen_random_uuid()::text")) @db.Text
+  title     String   @db.Text
+  imageUrl  String   @map("image_url") @db.Text
+  type      String   @default("movie") @db.Text // "movie" or "series"
+  platform  String?  @db.Text // Streaming platform (e.g., "HBO", "Netflix", "Disney+")
+  order     Int      @default(0)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
+
+  @@index([order])
+  @@index([type])
+  @@map("movies")
+}
+
+model WebsiteSetting {
+  id        String    @id @default(dbgenerated("gen_random_uuid()::text")) @db.Text
+  key       String    @unique @db.Text
+  value     String    @db.Text
+  category  String    @default("general") @db.Text
+  updatedBy String?   @map("updated_by") @db.Text
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
+
+  @@index([key])
+  @@index([category])
+  @@map("website_settings")
+}

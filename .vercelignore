@@ -1,0 +1,51 @@
+# Files and folders to ignore when deploying to Vercel
+
+# Development files
+node_modules/
+.next/
+out/
+build/
+*.tsbuildinfo
+next-env.d.ts
+
+# Environment files (use Vercel environment variables instead)
+.env*
+!.env.example
+
+# Development scripts and data
+scripts/
+data/
+*.log
+*.pem
+
+# Local development files
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Test files
+coverage/
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+
+# Documentation (optional - can include if needed)
+# README.md
+# DEPLOYMENT.md
+
+# Prisma generated files (will be generated during build)
+src/generated/prisma/
+
+# Docker files (not needed for Vercel)
+docker-compose.yml
+Dockerfile
+
+# Misc
+msapp168/
+.pnp
+.pnp.*
+
