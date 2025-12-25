@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useAuth } from '@/context/AuthContext'
 import { Card, CardContent } from '@/components/ui/card'
@@ -10,9 +10,8 @@ import { Spinner } from '@/components/ui/spinner'
 
 // Force dynamic rendering to prevent prerendering errors
 export const dynamic = 'force-dynamic'
-export const revalidate = 0
 
-export default function TopupSuccessPage() {
+function TopupSuccessContent() {
     const router = useRouter()
     const searchParams = useSearchParams()
     const { user, refreshUser } = useAuth()
@@ -86,6 +85,27 @@ export default function TopupSuccessPage() {
                 </CardContent>
             </Card>
         </main>
+    )
+}
+
+export default function TopupSuccessPage() {
+    return (
+        <Suspense fallback={
+            <main className='min-h-screen bg-gray-50 flex items-center justify-center p-4'>
+                <Card className='w-full max-w-md'>
+                    <CardContent className='pt-6'>
+                        <div className='text-center space-y-4'>
+                            <div className='flex items-center justify-center gap-2 text-gray-600'>
+                                <Spinner />
+                                <span className='text-sm'>กำลังโหลด...</span>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+            </main>
+        }>
+            <TopupSuccessContent />
+        </Suspense>
     )
 }
 
