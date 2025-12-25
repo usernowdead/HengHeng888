@@ -95,7 +95,7 @@ export const secrets = {
 
 // Validate all secrets on module load (only in production)
 if (process.env.NODE_ENV === 'production') {
-    const requiredSecrets = ['JWT_SECRET', 'API_KEY_MIDDLE', 'API_KEY_ADS4U', 'DATABASE_URL'];
+    const requiredSecrets = ['JWT_SECRET', 'DATABASE_URL'];
     const missing = requiredSecrets.filter(key => !process.env[key]);
     
     if (missing.length > 0) {
@@ -106,7 +106,7 @@ if (process.env.NODE_ENV === 'production') {
     }
     
     // Optional secrets (warn if missing but don't fail)
-    const optionalSecrets = ['API_KEY_PEAMSUB', 'API_KEY_GAFIW', 'API_KEY_EASYSLIP'];
+    const optionalSecrets = ['API_KEY_MIDDLE', 'API_KEY_ADS4U', 'API_KEY_PEAMSUB', 'API_KEY_GAFIW', 'API_KEY_EASYSLIP'];
     const missingOptional = optionalSecrets.filter(key => !process.env[key]);
     if (missingOptional.length > 0) {
         console.warn(`⚠️  WARNING: Optional API keys not set: ${missingOptional.join(', ')}. Some features may not work.`);
