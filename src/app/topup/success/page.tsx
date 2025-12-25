@@ -8,6 +8,10 @@ import { Button } from '@/components/ui/button'
 import { CheckCircle, Wallet } from 'lucide-react'
 import { Spinner } from '@/components/ui/spinner'
 
+// Force dynamic rendering to prevent prerendering errors
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export default function TopupSuccessPage() {
     const router = useRouter()
     const searchParams = useSearchParams()
