@@ -3,6 +3,7 @@ import axios from 'axios';
 import { prisma } from '@/lib/db';
 import { secrets } from '@/lib/secrets';
 import { requireAuth } from '@/lib/security/auth-utils';
+import { withCSRFSecurity } from '@/lib/security/middleware';
 
 const PAYMENT_GATEWAY_API_KEY = secrets.PAYMENT_GATEWAY_API_KEY?.trim();
 // Inwcloud PromptPay API Base URL
