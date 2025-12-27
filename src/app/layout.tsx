@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/context/AuthContext";
 import { WebsiteSettingsProvider } from "@/context/WebsiteSettingsContext";
 import ConditionalLayout from "@/components/ConditionalLayout";
+import ConsoleSuppress from "@/components/ConsoleSuppress";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -42,6 +43,7 @@ export default function RootLayout({
       >
         <AuthProvider>
           <WebsiteSettingsProvider>
+            <ConsoleSuppress />
             <ConditionalLayout>
               {children}
             </ConditionalLayout>

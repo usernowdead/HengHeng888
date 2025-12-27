@@ -60,15 +60,15 @@ export default function NavBarComponents() {
                         <Button variant={'ghost'} size="sm" className='h-8 px-1 sm:px-1.5 shrink-0'>
                             <Link href={'/store'} className="flex items-center gap-0.5 sm:gap-1">
                                 <ShoppingBag className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
-                                <span className='text-[10px] sm:text-xs font-medium hidden sm:inline'>ร้านค้า</span>
+                                <span className='text-[10px] sm:text-xs font-medium'>ร้านค้า</span>
                             </Link>
                         </Button>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button variant={'ghost'} size="sm" className='h-8 px-1 sm:px-1.5 cursor-pointer shrink-0'>
                                     <Package className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
-                                    <span className='text-[10px] sm:text-xs font-medium ml-0.5 sm:ml-1 hidden sm:inline'>บริการ</span>
-                                    <ChevronDown className="h-3 w-3 sm:h-3.5 sm:w-3.5 ml-0.5 shrink-0 hidden sm:inline" />
+                                    <span className='text-[10px] sm:text-xs font-medium ml-0.5 sm:ml-1'>บริการ</span>
+                                    <ChevronDown className="h-3 w-3 sm:h-3.5 sm:w-3.5 ml-0.5 shrink-0" />
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent className="w-56" align="start">
@@ -117,7 +117,7 @@ export default function NavBarComponents() {
                         <Button variant={'ghost'} size="sm" className='h-8 px-1 sm:px-1.5 shrink-0'>
                             <Link href={'/topup'} className="flex items-center gap-0.5 sm:gap-1">
                                 <CreditCard className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
-                                <span className='text-[10px] sm:text-xs font-medium hidden sm:inline'>เติมเงิน</span>
+                                <span className='text-[10px] sm:text-xs font-medium'>เติมเงิน</span>
                             </Link>
                         </Button>
                     </div>

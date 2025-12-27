@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from 'react'
 import { Button } from '../ui/button'
-import { LogInIcon, User, UserPlusIcon, Mail, Lock, Eye, EyeOff, Check, X, Shield, QrCode, Smartphone } from 'lucide-react'
+import { LogInIcon, User, UserPlusIcon, Mail, Lock, Eye, EyeOff, Check, X, Shield } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
@@ -59,14 +59,7 @@ export default function SignInAndSignUp() {
     const [loginTurnstileToken, setLoginTurnstileToken] = useState('')
     const [registerTurnstileToken, setRegisterTurnstileToken] = useState('')
 
-    // QR Login states
-    const [qrLoginData, setQrLoginData] = useState({
-        sessionId: '',
-        qrCode: '',
-        expiresAt: '',
-        status: 'idle' as 'idle' | 'generating' | 'waiting' | 'success' | 'expired' | 'error'
-    })
-    const [qrStatusInterval, setQrStatusInterval] = useState<NodeJS.Timeout | null>(null)
+    // QR Login states - removed (not used)
 
     // Turnstile callback functions
     const handleLoginTurnstileVerify = (token: string) => {
@@ -312,93 +305,7 @@ export default function SignInAndSignUp() {
         }
     }
 
-    // QR Login functions
-    const handleGenerateQR = async () => {
-        setQrLoginData(prev => ({ ...prev, status: 'generating' }))
-
-        try {
-            const response = await fetch('/api/auth/qr/generate', {
-                method: 'POST'
-            })
-
-            const data = await response.json()
-
-            if (data.success) {
-                setQrLoginData({
-                    sessionId: data.sessionId,
-                    qrCode: data.qrCode,
-                    expiresAt: data.expiresAt,
-                    status: 'waiting'
-                })
-
-                // Start polling for status
-                startQrStatusPolling(data.sessionId)
-            } else {
-                toast.error(data.message || 'เกิดข้อผิดพลาดในการสร้าง QR Code')
-                setQrLoginData(prev => ({ ...prev, status: 'error' }))
-            }
-        } catch (error) {
-            console.error('QR generate error:', error)
-            toast.error('เกิดข้อผิดพลาดในการสร้าง QR Code')
-            setQrLoginData(prev => ({ ...prev, status: 'error' }))
-        }
-    }
-
-    const startQrStatusPolling = (sessionId: string) => {
-        // Clear any existing interval
-        if (qrStatusInterval) {
-            clearInterval(qrStatusInterval)
-        }
-
-        const interval = setInterval(async () => {
-            try {
-                const response = await fetch(`/api/auth/qr/status/${sessionId}`)
-                const data = await response.json()
-
-                if (data.success) {
-                    if (data.status === 'verified' && data.token && data.user) {
-                        // Login successful
-                        setQrLoginData(prev => ({ ...prev, status: 'success' }))
-                        await login(data.token, data.user)
-                        toast.success('เข้าสู่ระบบสำเร็จ')
-                        router.push('/')
-                        clearInterval(interval)
-                    } else if (data.status === 'expired') {
-                        // QR expired
-                        setQrLoginData(prev => ({ ...prev, status: 'expired' }))
-                        toast.error('QR Code หมดอายุ กรุณาสร้างใหม่')
-                        clearInterval(interval)
-                    }
-                    // For 'scanned' status, continue polling
-                }
-            } catch (error) {
-                console.error('QR status check error:', error)
-            }
-        }, 2000) // Check every 2 seconds
-
-        setQrStatusInterval(interval)
-
-        // Auto expire after QR expires
-        const expiresAt = new Date(qrLoginData.expiresAt)
-        const now = new Date()
-        const timeUntilExpiry = expiresAt.getTime() - now.getTime()
-
-        setTimeout(() => {
-            if (qrLoginData.status === 'waiting') {
-                setQrLoginData(prev => ({ ...prev, status: 'expired' }))
-                clearInterval(interval)
-            }
-        }, timeUntilExpiry)
-    }
-
-    // Cleanup on unmount
-    useEffect(() => {
-        return () => {
-            if (qrStatusInterval) {
-                clearInterval(qrStatusInterval)
-            }
-        }
-    }, [qrStatusInterval])
+    // QR Login functions - removed (not used)
 
     return (
         <>
@@ -425,17 +332,6 @@ export default function SignInAndSignUp() {
                                             size={16}
                                         />
                                         เข้าสู่ระบบ
-                                    </TabsTrigger>
-                                    <TabsTrigger
-                                        className="relative overflow-hidden rounded-none border py-2 after:pointer-events-none after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 first:rounded-s last:rounded-e data-[state=active]:bg-muted data-[state=active]:after:bg-primary"
-                                        value="tab-4"
-                                    >
-                                        <QrCode
-                                            aria-hidden="true"
-                                            className="-ms-0.5 me-1.5 opacity-60"
-                                            size={16}
-                                        />
-                                        QR เข้าสู่ระบบ
                                     </TabsTrigger>
                                     <TabsTrigger
                                         className="relative overflow-hidden rounded-none border py-2 after:pointer-events-none after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 first:rounded-s last:rounded-e data-[state=active]:bg-muted data-[state=active]:after:bg-primary"
@@ -526,111 +422,6 @@ export default function SignInAndSignUp() {
                                             </p>
                                         </div>
                                     </form>
-                                </div>
-                            </TabsContent>
-                            <TabsContent value="tab-4">
-                                <div>
-                                    <h4 className='text-base font-medium text-center'>
-                                        เข้าสู่ระบบด้วย QR Code
-                                    </h4>
-                                    <p className='text-xs text-muted-foreground text-center'>
-                                        สแกน QR Code จากอุปกรณ์อื่นที่เข้าสู่ระบบไว้แล้ว
-                                    </p>
-                                </div>
-                                <div className='space-y-4'>
-                                    {qrLoginData.status === 'idle' && (
-                                        <div className='text-center space-y-4'>
-                                            <Smartphone className='w-16 h-16 mx-auto text-muted-foreground' />
-                                            <p className='text-sm text-muted-foreground'>
-                                                เริ่มการเข้าสู่ระบบด้วย QR Code
-                                            </p>
-                                            <Button
-                                                onClick={handleGenerateQR}
-                                                className='w-full'
-                                            >
-                                                <QrCode className="w-4 h-4 mr-2" />
-                                                สร้าง QR Code
-                                            </Button>
-                                        </div>
-                                    )}
-
-                                    {(qrLoginData.status === 'generating' || qrLoginData.status === 'waiting') && (
-                                        <div className='text-center space-y-4'>
-                                            {qrLoginData.qrCode && (
-                                                <div className='flex justify-center'>
-                                                    <img
-                                                        src={qrLoginData.qrCode}
-                                                        alt="QR Code for login"
-                                                        className='w-48 h-48'
-                                                    />
-                                                </div>
-                                            )}
-
-                                            <div className='space-y-2'>
-                                                <p className='text-sm font-medium'>
-                                                    สแกน QR Code นี้ด้วยอุปกรณ์อื่น
-                                                </p>
-                                                <p className='text-xs text-muted-foreground'>
-                                                    {qrLoginData.status === 'waiting' ? 'กำลังรอการสแกน...' : 'กำลังสร้าง QR Code...'}
-                                                </p>
-
-                                                {qrLoginData.expiresAt && (
-                                                    <p className='text-xs text-orange-600'>
-                                                        หมดอายุใน: {Math.max(0, Math.floor((new Date(qrLoginData.expiresAt).getTime() - Date.now()) / 1000))} วินาที
-                                                    </p>
-                                                )}
-                                            </div>
-
-                                            <Button
-                                                variant="outline"
-                                                onClick={() => {
-                                                    setQrLoginData({
-                                                        sessionId: '',
-                                                        qrCode: '',
-                                                        expiresAt: '',
-                                                        status: 'idle'
-                                                    })
-                                                    if (qrStatusInterval) {
-                                                        clearInterval(qrStatusInterval)
-                                                    }
-                                                }}
-                                                className='w-full'
-                                            >
-                                                ยกเลิก
-                                            </Button>
-                                        </div>
-                                    )}
-
-                                    {qrLoginData.status === 'expired' && (
-                                        <div className='text-center space-y-4'>
-                                            <X className='w-16 h-16 mx-auto text-red-500' />
-                                            <p className='text-sm text-red-600'>
-                                                QR Code หมดอายุแล้ว
-                                            </p>
-                                            <Button
-                                                onClick={handleGenerateQR}
-                                                className='w-full'
-                                            >
-                                                <QrCode className="w-4 h-4 mr-2" />
-                                                สร้าง QR Code ใหม่
-                                            </Button>
-                                        </div>
-                                    )}
-
-                                    {qrLoginData.status === 'error' && (
-                                        <div className='text-center space-y-4'>
-                                            <X className='w-16 h-16 mx-auto text-red-500' />
-                                            <p className='text-sm text-red-600'>
-                                                เกิดข้อผิดพลาดในการสร้าง QR Code
-                                            </p>
-                                            <Button
-                                                onClick={handleGenerateQR}
-                                                className='w-full'
-                                            >
-                                                ลองใหม่
-                                            </Button>
-                                        </div>
-                                    )}
                                 </div>
                             </TabsContent>
                             <TabsContent value="tab-3">
