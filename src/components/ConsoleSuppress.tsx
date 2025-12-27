@@ -4,11 +4,15 @@ import { useEffect } from 'react';
 
 export default function ConsoleSuppress() {
   useEffect(() => {
+    // Only run on client-side
+    if (typeof window === 'undefined') return;
+    
     // Suppress console errors and warnings in production
     if (process.env.NODE_ENV === 'production') {
       const originalError = console.error;
       const originalWarn = console.warn;
       
+      // Override console methods to suppress output
       console.error = () => {};
       console.warn = () => {};
       
