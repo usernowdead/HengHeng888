@@ -65,36 +65,78 @@ function getDatabaseUrlLazy(): string {
 }
 
 // Optimized Prisma Client with connection pooling support
-export const prisma = globalForPrisma.prisma ?? new PrismaClient({
-  log: process.env.NODE_ENV === 'development' 
-    ? ['query', 'error', 'warn'] 
-    : ['error'],
-  datasources: {
-    db: {
-      url: getDatabaseUrlLazy(),
-    },
-  },
-  // Connection pooling is handled by the connection string
-  // For Vercel: Use connection pooling URL with ?pgbouncer=true&connection_limit=1&sslmode=require
-})
+let prismaInstance: PrismaClient;
 
-// Log database URL configuration in development (never log full URL in production)
-if (process.env.NODE_ENV === 'development') {
+try {
+  // Get database URL first
+  const dbUrl = getDatabaseUrlLazy();
+  
+  // Log database URL configuration (never log full URL in production)
   try {
-    const urlObj = new URL(getDatabaseUrlLazy());
-    console.log('Database connection configured:', {
+    const urlObj = new URL(dbUrl);
+    const logInfo = {
       host: urlObj.hostname,
       port: urlObj.port,
       database: urlObj.pathname,
       hasPgbouncer: urlObj.searchParams.has('pgbouncer'),
       hasConnectionLimit: urlObj.searchParams.has('connection_limit'),
       sslMode: urlObj.searchParams.get('sslmode'),
-      isVercel: !!process.env.VERCEL
-    });
+      connectTimeout: urlObj.searchParams.get('connect_timeout'),
+      isVercel: !!process.env.VERCEL,
+      nodeEnv: process.env.NODE_ENV,
+    };
+    
+    if (process.env.NODE_ENV === 'development') {
+      console.log('✅ [DB] Database connection configured:', logInfo);
+    } else {
+      // In production, only log if there's an issue
+      console.log('✅ [DB] Database connection initialized:', {
+        host: logInfo.host,
+        hasPgbouncer: logInfo.hasPgbouncer,
+        isVercel: logInfo.isVercel,
+      });
+    }
   } catch (error) {
-    console.warn('⚠️ Could not parse database URL for logging:', error);
+    console.warn('⚠️ [DB] Could not parse database URL for logging:', error);
   }
+
+  // Create Prisma client instance
+  prismaInstance = globalForPrisma.prisma ?? new PrismaClient({
+    log: process.env.NODE_ENV === 'development' 
+      ? ['query', 'error', 'warn'] 
+      : ['error'],
+    datasources: {
+      db: {
+        url: dbUrl,
+      },
+    },
+    // Connection pooling is handled by the connection string
+    // For Vercel: Use connection pooling URL with ?pgbouncer=true&connection_limit=1&sslmode=require
+  });
+
+  // Store in global for development to prevent multiple instances
+  if (process.env.NODE_ENV !== 'production') {
+    globalForPrisma.prisma = prismaInstance;
+  }
+} catch (error: any) {
+  console.error('❌ [DB] Failed to initialize Prisma Client:', error);
+  console.error('❌ [DB] Error details:', {
+    message: error.message,
+    code: error.code,
+    name: error.name,
+  });
+  
+  // Create a fallback Prisma client that will fail at runtime
+  // This prevents module initialization errors
+  prismaInstance = new PrismaClient({
+    log: ['error'],
+    datasources: {
+      db: {
+        url: 'postgresql://placeholder:placeholder@localhost:5432/placeholder',
+      },
+    },
+  });
 }
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
+export const prisma = prismaInstance;
 
