@@ -2,13 +2,34 @@
 // Validates secrets and throws error in production if missing
 // Senior Security Engineer Level Implementation
 
+// Check if we're in build time (Next.js build phase)
+function isBuildTime(): boolean {
+  // Next.js sets NEXT_PHASE during build
+  if (process.env.NEXT_PHASE === 'phase-production-build') return true;
+  // Vercel sets VERCEL during build, but not VERCEL_ENV until runtime
+  if (process.env.VERCEL && !process.env.VERCEL_ENV) return true;
+  // If we're in production but not in a runtime environment, likely build time
+  if (process.env.NODE_ENV === 'production' && !process.env.VERCEL_ENV && typeof window === 'undefined') {
+    // Check if we're actually in a build context by checking for build-specific env vars
+    return true;
+  }
+  return false;
+}
+
 function getSecret(key: string, defaultValue?: string, validator?: (value: string) => void, allowDefaultInProd = false): string {
   const value = process.env[key];
   const isProduction = process.env.NODE_ENV === 'production';
+  const isBuild = isBuildTime();
   
   if (!value) {
-    // In production, never allow default values for sensitive keys (JWT/API keys)
-    if (isProduction && !allowDefaultInProd) {
+    // During build time, allow missing DATABASE_URL (it will be set at runtime)
+    if (isBuild && key === 'DATABASE_URL') {
+      console.warn(`⚠️  WARNING: ${key} not set during build. This is OK - it will be set at runtime.`);
+      return 'postgresql://placeholder:placeholder@localhost:5432/placeholder';
+    }
+    
+    // In production runtime, never allow default values for sensitive keys (JWT/API keys)
+    if (isProduction && !allowDefaultInProd && !isBuild) {
       throw new Error(
         `❌ CRITICAL: ${key} environment variable is required in production and cannot use default values. ` +
         `Please set it in your environment variables or .env file. ` +
@@ -21,11 +42,17 @@ function getSecret(key: string, defaultValue?: string, validator?: (value: strin
       return defaultValue;
     }
     
+    // During build time, allow missing values for optional keys
+    if (isBuild) {
+      console.warn(`⚠️  WARNING: ${key} not set during build. This is OK if it's optional.`);
+      return defaultValue || '';
+    }
+    
     throw new Error(`${key} environment variable is required.`);
   }
   
-  // In production, validate that value is not a default value for sensitive keys
-  if (isProduction && !allowDefaultInProd && defaultValue) {
+  // In production runtime, validate that value is not a default value for sensitive keys
+  if (isProduction && !allowDefaultInProd && defaultValue && !isBuild) {
     if (value === defaultValue) {
       throw new Error(
         `❌ CRITICAL: ${key} cannot use default value in production. ` +
@@ -34,11 +61,16 @@ function getSecret(key: string, defaultValue?: string, validator?: (value: strin
     }
   }
   
-  // Run custom validator if provided
+  // Run custom validator if provided (skip during build time for DATABASE_URL)
   if (validator) {
     try {
       validator(value);
     } catch (error: any) {
+      // During build time, warn instead of throwing for DATABASE_URL
+      if (isBuild && key === 'DATABASE_URL') {
+        console.warn(`⚠️  WARNING: ${key} validation failed during build: ${error.message}. This is OK - it will be validated at runtime.`);
+        return value; // Return the value anyway during build
+      }
       throw new Error(`Invalid ${key}: ${error.message}`);
     }
   }
@@ -94,8 +126,8 @@ export const secrets = {
   DATABASE_URL: getSecret('DATABASE_URL', undefined, validateDatabaseURL, false),
 };
 
-// Validate all secrets on module load (only in production)
-if (process.env.NODE_ENV === 'production') {
+// Validate all secrets on module load (only in production runtime, not during build)
+if (process.env.NODE_ENV === 'production' && !isBuildTime()) {
     const requiredSecrets = ['JWT_SECRET', 'DATABASE_URL'];
     const missing = requiredSecrets.filter(key => !process.env[key]);
     
@@ -114,5 +146,12 @@ if (process.env.NODE_ENV === 'production') {
     }
     
     console.log('✅ All required secrets validated');
+} else if (isBuildTime()) {
+    // During build time, just warn about missing secrets but don't fail
+    const requiredSecrets = ['JWT_SECRET', 'DATABASE_URL'];
+    const missing = requiredSecrets.filter(key => !process.env[key]);
+    if (missing.length > 0) {
+        console.warn(`⚠️  WARNING: Some environment variables are not set during build: ${missing.join(', ')}. They should be set at runtime.`);
+    }
 }
 

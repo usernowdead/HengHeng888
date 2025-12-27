@@ -108,6 +108,17 @@ async function handleLogin(request: NextRequest) {
             }
         } catch (dbError: any) {
             console.error('Database error:', dbError);
+            console.error('Database error code:', dbError.code);
+            console.error('Database error message:', dbError.message);
+            
+            // Handle database connection errors
+            if (dbError.code === 'P1001' || dbError.code === 'P1002' || dbError.message?.includes('Can\'t reach database server')) {
+                return NextResponse.json({
+                    success: false,
+                    message: 'ไม่สามารถเชื่อมต่อฐานข้อมูลได้ กรุณาลองใหม่อีกครั้ง'
+                }, { status: 503 });
+            }
+            
             throw new Error(`Database query failed: ${dbError.message}`);
         }
 
@@ -274,8 +285,18 @@ async function handleLogin(request: NextRequest) {
 
     } catch (error: any) {
         console.error('Login error:', error);
+        console.error('Error code:', error.code);
         console.error('Error stack:', error.stack);
         console.error('Error message:', error.message);
+        
+        // Handle database connection errors
+        if (error.code === 'P1001' || error.code === 'P1002' || error.message?.includes('Can\'t reach database server')) {
+            return NextResponse.json({
+                success: false,
+                message: 'ไม่สามารถเชื่อมต่อฐานข้อมูลได้ กรุณาลองใหม่อีกครั้ง'
+            }, { status: 503 });
+        }
+        
         return NextResponse.json({
             success: false,
             message: 'เกิดข้อผิดพลาดในการเข้าสู่ระบบ',

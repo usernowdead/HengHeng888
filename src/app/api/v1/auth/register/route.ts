@@ -144,6 +144,8 @@ async function handleRegister(request: NextRequest) {
 
   } catch (error: any) {
     console.error('Registration error:', error);
+    console.error('Error code:', error.code);
+    console.error('Error message:', error.message);
     
     // Handle Prisma unique constraint errors
     if (error.code === 'P2002') {
@@ -153,9 +155,19 @@ async function handleRegister(request: NextRequest) {
       }, { status: 400 });
     }
 
+    // Handle database connection errors
+    if (error.code === 'P1001' || error.code === 'P1002' || error.message?.includes('Can\'t reach database server')) {
+      console.error('Database connection error:', error);
+      return NextResponse.json({
+        success: false,
+        message: 'ไม่สามารถเชื่อมต่อฐานข้อมูลได้ กรุณาลองใหม่อีกครั้ง'
+      }, { status: 503 });
+    }
+
     return NextResponse.json({
       success: false,
-      message: 'เกิดข้อผิดพลาดในการสมัครสมาชิก'
+      message: 'เกิดข้อผิดพลาดในการสมัครสมาชิก',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     }, { status: 500 });
   }
 }
