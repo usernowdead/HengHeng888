@@ -14,24 +14,59 @@ function getDatabaseUrl(): string {
 
   // For Supabase on Vercel, ensure connection pooling is properly configured
   if (process.env.VERCEL && (dbUrl.includes('supabase.co') || dbUrl.includes('pooler.supabase.com'))) {
-    // Check if pgbouncer is enabled
-    const hasPgbouncer = dbUrl.includes('pgbouncer=true');
-    const hasConnectionLimit = dbUrl.includes('connection_limit=');
-    
-    // If pgbouncer is enabled but connection_limit is missing, add it
-    if (hasPgbouncer && !hasConnectionLimit) {
+    try {
+      // Parse URL to add/update parameters
+      const url = new URL(dbUrl);
+      
+      // Ensure pgbouncer is enabled
+      url.searchParams.set('pgbouncer', 'true');
+      
+      // Set connection limit for serverless (Vercel)
+      url.searchParams.set('connection_limit', '1');
+      
+      // Add SSL requirement for Supabase (required for secure connections)
+      if (!url.searchParams.has('sslmode')) {
+        url.searchParams.set('sslmode', 'require');
+      }
+      
+      // Add connect_timeout for better reliability
+      if (!url.searchParams.has('connect_timeout')) {
+        url.searchParams.set('connect_timeout', '10');
+      }
+      
+      return url.toString();
+    } catch (error) {
+      // Fallback: manually append parameters if URL parsing fails
+      console.warn('Failed to parse DATABASE_URL, using fallback method:', error);
       const separator = dbUrl.includes('?') ? '&' : '?';
-      return `${dbUrl}${separator}connection_limit=1`;
-    }
-    
-    // If neither pgbouncer nor connection_limit exists, add both
-    if (!hasPgbouncer) {
-      const separator = dbUrl.includes('?') ? '&' : '?';
-      return `${dbUrl}${separator}pgbouncer=true&connection_limit=1`;
+      const params = [
+        'pgbouncer=true',
+        'connection_limit=1',
+        'sslmode=require',
+        'connect_timeout=10'
+      ].join('&');
+      return `${dbUrl}${separator}${params}`;
     }
   }
 
   return dbUrl;
+}
+
+// Get the database URL
+const databaseUrl = getDatabaseUrl();
+
+// Log database URL configuration in development (never log full URL in production)
+if (process.env.NODE_ENV === 'development') {
+  const urlObj = new URL(databaseUrl);
+  console.log('Database connection configured:', {
+    host: urlObj.hostname,
+    port: urlObj.port,
+    database: urlObj.pathname,
+    hasPgbouncer: urlObj.searchParams.has('pgbouncer'),
+    hasConnectionLimit: urlObj.searchParams.has('connection_limit'),
+    sslMode: urlObj.searchParams.get('sslmode'),
+    isVercel: !!process.env.VERCEL
+  });
 }
 
 // Optimized Prisma Client with connection pooling support
@@ -41,11 +76,11 @@ export const prisma = globalForPrisma.prisma ?? new PrismaClient({
     : ['error'],
   datasources: {
     db: {
-      url: getDatabaseUrl(),
+      url: databaseUrl,
     },
   },
   // Connection pooling is handled by the connection string
-  // For Vercel: Use connection pooling URL with ?pgbouncer=true&connection_limit=1
+  // For Vercel: Use connection pooling URL with ?pgbouncer=true&connection_limit=1&sslmode=require
 })
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
