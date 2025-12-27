@@ -286,15 +286,37 @@ async function handleLogin(request: NextRequest) {
     } catch (error: any) {
         console.error('Login error:', error);
         console.error('Error code:', error.code);
+        console.error('Error name:', error.name);
         console.error('Error stack:', error.stack);
         console.error('Error message:', error.message);
         
+        // Handle Prisma initialization errors
+        if (error.message?.includes('DATABASE_URL') || error.message?.includes('environment variable')) {
+            console.error('❌ Database configuration error:', error.message);
+            return NextResponse.json({
+                success: false,
+                message: 'เกิดข้อผิดพลาดในการตั้งค่าฐานข้อมูล กรุณาติดต่อผู้ดูแลระบบ'
+            }, { status: 500 });
+        }
+        
         // Handle database connection errors
-        if (error.code === 'P1001' || error.code === 'P1002' || error.message?.includes('Can\'t reach database server')) {
+        if (error.code === 'P1001' || error.code === 'P1002' || 
+            error.code === 'P1000' || error.message?.includes('Can\'t reach database server') ||
+            error.message?.includes('Connection') || error.message?.includes('timeout')) {
+            console.error('❌ Database connection error:', error.message);
             return NextResponse.json({
                 success: false,
                 message: 'ไม่สามารถเชื่อมต่อฐานข้อมูลได้ กรุณาลองใหม่อีกครั้ง'
             }, { status: 503 });
+        }
+        
+        // Handle Prisma query errors
+        if (error.code?.startsWith('P')) {
+            console.error('❌ Prisma error:', error.code, error.message);
+            return NextResponse.json({
+                success: false,
+                message: 'เกิดข้อผิดพลาดในการเข้าถึงฐานข้อมูล กรุณาลองใหม่อีกครั้ง'
+            }, { status: 500 });
         }
         
         return NextResponse.json({
