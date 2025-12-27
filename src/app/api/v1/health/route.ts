@@ -6,7 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { checkDatabaseHealth } from '@/lib/db-pool';
+import { prisma } from '@/lib/db';
 import { getCacheStats } from '@/lib/cache';
 
 export const dynamic = 'force-dynamic';
@@ -16,8 +16,15 @@ export async function GET(request: NextRequest) {
   const startTime = Date.now();
   
   try {
-    // Check database connection
-    const dbHealthy = await checkDatabaseHealth();
+    // Check database connection using Prisma
+    let dbHealthy = false;
+    try {
+      await prisma.$queryRaw`SELECT 1`;
+      dbHealthy = true;
+    } catch (dbError: any) {
+      console.error('Database health check failed:', dbError);
+      dbHealthy = false;
+    }
     
     // Check cache (if Redis is configured)
     let cacheHealthy = true;
