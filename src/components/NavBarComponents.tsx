@@ -49,7 +49,7 @@ export default function NavBarComponents() {
                             )}
                             <h2 className='text-xs sm:text-sm md:text-base font-semibold leading-tight whitespace-nowrap'>
                                 <span suppressHydrationWarning>
-                                    {settings?.websiteName || 'Oho568'}
+                                    {settings?.websiteName || 'Payplearn'}
                                 </span>
                             </h2>
                         </Link>

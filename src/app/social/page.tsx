@@ -43,16 +43,37 @@ export default function SocialPage() {
     const fetchSocialServices = async () => {
         try {
             const response = await fetch('/api/v1/social');
+            
+            // Check if response is OK
+            if (!response.ok) {
+                console.error('❌ [Social] API response not OK:', response.status, response.statusText);
+                setAllServices([]);
+                setLoading(false);
+                return;
+            }
+
+            // Check if response is JSON
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                const text = await response.text();
+                console.error('❌ [Social] Response is not JSON:', text.substring(0, 200));
+                setAllServices([]);
+                setLoading(false);
+                return;
+            }
+
             const data: ApiResponse = await response.json();
 
             if (data.success) {
-                setAllServices(data.services);
+                setAllServices(data.services || []);
             } else {
-                toast.error('ไม่สามารถโหลดข้อมูลบริการได้');
+                setAllServices([]);
             }
+            // Removed error toast to prevent lag
         } catch (error) {
-            console.error('Error fetching social services:', error);
-            toast.error('เกิดข้อผิดพลาดในการโหลดข้อมูล');
+            console.error('❌ [Social] Error fetching social services:', error);
+            setAllServices([]);
+            // Removed error toast to prevent lag
         } finally {
             setLoading(false);
         }

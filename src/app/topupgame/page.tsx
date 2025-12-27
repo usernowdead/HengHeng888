@@ -42,16 +42,37 @@ export default function TopupPage() {
     const fetchTopupGames = async () => {
         try {
             const response = await fetch('/api/v1/topup');
+            
+            // Check if response is OK
+            if (!response.ok) {
+                console.error('❌ [TopupGame] API response not OK:', response.status, response.statusText);
+                setAllGames([]);
+                setLoading(false);
+                return;
+            }
+
+            // Check if response is JSON
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                const text = await response.text();
+                console.error('❌ [TopupGame] Response is not JSON:', text.substring(0, 200));
+                setAllGames([]);
+                setLoading(false);
+                return;
+            }
+
             const data = await response.json();
 
             if (data && Array.isArray(data)) {
                 setAllGames(data);
             } else {
-                toast.error('ไม่สามารถโหลดข้อมูลเกมได้');
+                setAllGames([]);
             }
+            // Removed error toast to prevent lag
         } catch (error) {
-            console.error('Error fetching topup games:', error);
-            toast.error('เกิดข้อผิดพลาดในการโหลดข้อมูล');
+            console.error('❌ [TopupGame] Error fetching topup games:', error);
+            setAllGames([]);
+            // Removed error toast to prevent lag
         } finally {
             setLoading(false);
         }

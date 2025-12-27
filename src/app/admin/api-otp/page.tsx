@@ -52,12 +52,11 @@ export default function ApiOtpPage() {
             if (data.success) {
                 setProducts(data.products || [])
                 setLastSync(new Date())
-            } else {
-                toast.error(data.message || 'ไม่สามารถโหลดข้อมูล OTP ได้')
             }
+            // Removed error toast to prevent lag
         } catch (error) {
             console.error('Error fetching OTP products:', error)
-            toast.error('เกิดข้อผิดพลาดในการโหลดข้อมูล')
+            // Removed error toast to prevent lag
         } finally {
             setLoading(false)
         }

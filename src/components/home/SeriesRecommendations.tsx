@@ -29,29 +29,40 @@ export default function SeriesRecommendations() {
         {
             id: 's1',
             title: 'SQUID GAME',
-            imageUrl: 'https://img.shibuya24.com/series/squid_game.webp'
+            imageUrl: '/series/0.webp'
         },
         {
             id: 's2',
             title: 'STRANGER THINGS',
-            imageUrl: 'https://img.shibuya24.com/series/stranger_things.webp'
+            imageUrl: '/series/1.webp'
         },
         {
             id: 's3',
             title: 'THE BOYS',
-            imageUrl: 'https://img.shibuya24.com/series/the_boys.webp'
+            imageUrl: '/series/2.webp'
         },
         {
             id: 's4',
             title: 'BREAKING BAD',
-            imageUrl: 'https://img.shibuya24.com/series/breaking_bad.webp'
+            imageUrl: '/series/4.webp'
         },
         {
             id: 's5',
             title: 'GAME OF THRONES',
-            imageUrl: 'https://img.shibuya24.com/series/game_of_thrones.webp'
+            imageUrl: '/series/0.webp'
         }
     ];
+
+    // Helper function to convert imageUrl to local folder path
+    const getSeriesImagePath = (series: Series, index: number): string => {
+        // If imageUrl is already a local path (starts with /), use it
+        if (series.imageUrl && series.imageUrl.startsWith('/')) {
+            return series.imageUrl;
+        }
+        // If imageUrl is an external URL (starts with http), convert to local path using index
+        // Otherwise, use index to find image in /series/ folder
+        return `/series/${index}.webp`;
+    };
 
     const fetchSeries = async () => {
         try {
@@ -65,6 +76,25 @@ export default function SeriesRecommendations() {
                     'Cache-Control': 'no-cache'
                 }
             });
+            
+            // Check if response is OK
+            if (!response.ok) {
+                console.error('❌ [SeriesRecommendations] API response not OK:', response.status, response.statusText);
+                setSeries(defaultSeries);
+                setLoading(false);
+                return;
+            }
+
+            // Check if response is JSON
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                const text = await response.text();
+                console.error('❌ [SeriesRecommendations] Response is not JSON:', text.substring(0, 200));
+                setSeries(defaultSeries);
+                setLoading(false);
+                return;
+            }
+            
             const data = await response.json();
             
             console.log('📺 [SeriesRecommendations] API Response:', {
@@ -174,7 +204,7 @@ export default function SeriesRecommendations() {
                         className="w-full"
                     >
                         <CarouselContent className="-ml-2 md:-ml-4">
-                            {series.map((item) => {
+                            {series.map((item, index) => {
                                 // Debug: Log each item to see if platform exists
                                 if (item.title === 'It: Derry' || item.title.includes('Derry')) {
                                     console.log('📺 [SeriesRecommendations] Rendering item:', {
@@ -183,12 +213,13 @@ export default function SeriesRecommendations() {
                                         hasPlatform: !!item.platform
                                     });
                                 }
+                                const imagePath = getSeriesImagePath(item, index);
                                 return (
                                     <CarouselItem key={item.id} className="pl-2 md:pl-4 basis-[45%] sm:basis-[35%] md:basis-[30%]">
                                         <div className="group relative overflow-hidden rounded-lg border bg-card cursor-pointer hover:shadow-md transition-shadow">
                                             <div className="aspect-[2/3] relative overflow-hidden">
                                                 <img
-                                                    src={item.imageUrl}
+                                                    src={imagePath}
                                                     alt={item.title}
                                                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 select-none"
                                                     draggable={false}
@@ -202,7 +233,15 @@ export default function SeriesRecommendations() {
                                                     }}
                                                     onError={(e) => {
                                                         const target = e.target as HTMLImageElement;
-                                                        target.src = '/image-product-app-p.png';
+                                                        // Try fallback with different extensions
+                                                        const currentSrc = target.src;
+                                                        if (currentSrc.endsWith('.webp')) {
+                                                            target.src = currentSrc.replace('.webp', '.jpg');
+                                                        } else if (currentSrc.endsWith('.jpg')) {
+                                                            target.src = currentSrc.replace('.jpg', '.png');
+                                                        } else {
+                                                            target.src = '/image-product-app-p.png';
+                                                        }
                                                     }}
                                                 />
                                             </div>

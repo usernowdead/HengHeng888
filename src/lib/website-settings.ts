@@ -27,7 +27,7 @@ export interface WebsiteSettingsData {
 }
 
 const DEFAULT_SETTINGS: WebsiteSettingsData = {
-  websiteName: 'Oho568',
+  websiteName: 'Payplearn',
   logoUrl: '',
   announcement: '',
   shopDescription: 'บริการเว็บไซต์ OTP แอฟพรีเมี่ยม อีเมล์ต่างๆ บริการดีไว้ใจได้100%% บริการOTP ออโต้ระบบรวดเร็ว ยืนยันแอปต่างๆ ซื้อเน็ตฟิกราคาถูกรายเดือน, Netflixรายเดือนถูกๆ, บริการ OTP ราคาถูก, OTPเบอร์ถูก, OTP24HR,เบอร์ OTP เติมเงิน มือถือ,เติมเกมส์ออนไลน์',

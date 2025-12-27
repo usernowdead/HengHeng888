@@ -1,4 +1,4 @@
-# 🛒 Oho568 - Top-up Game & Social Boosting Platform
+# 🛒 Payplearn - Top-up Game & Social Boosting Platform
 
 Modern web application for game top-up and social media boosting services.
 

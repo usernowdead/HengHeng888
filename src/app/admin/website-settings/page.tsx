@@ -17,7 +17,7 @@ export default function WebsiteSettingsPage() {
   const [loadingData, setLoadingData] = useState(true)
   const [previewImages, setPreviewImages] = useState<Record<string, boolean>>({})
   const [formData, setFormData] = useState({
-    websiteName: 'Oho568',
+    websiteName: 'Payplearn',
     logoUrl: '',
     announcement: '',
     shopDescription: '',
@@ -166,7 +166,7 @@ export default function WebsiteSettingsPage() {
                 id='websiteName'
                 value={formData.websiteName}
                 onChange={(e) => setFormData({ ...formData, websiteName: e.target.value })}
-                placeholder='เช่น Oho568'
+                placeholder='เช่น Payplearn'
                 required
               />
             </div>

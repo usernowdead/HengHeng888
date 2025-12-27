@@ -40,16 +40,37 @@ export default function OtpPage() {
     const fetchProducts = async () => {
       try {
         const res = await fetch("/api/v1/otp/products");
+        
+        // Check if response is OK
+        if (!res.ok) {
+          console.error('❌ [OTP] API response not OK:', res.status, res.statusText);
+          setProducts([]);
+          setLoadingProducts(false);
+          return;
+        }
+
+        // Check if response is JSON
+        const contentType = res.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+          const text = await res.text();
+          console.error('❌ [OTP] Response is not JSON:', text.substring(0, 200));
+          setProducts([]);
+          setLoadingProducts(false);
+          return;
+        }
+
         const data = await res.json();
 
         if (data.success) {
           setProducts(data.products || []);
         } else {
-          toast.error(data.message || "ไม่สามารถโหลดรายการ OTP ได้");
+          setProducts([]);
         }
+        // Removed error toast to prevent lag
       } catch (error) {
-        console.error("Error fetching OTP products:", error);
-        toast.error("เกิดข้อผิดพลาดในการโหลดรายการ OTP");
+        console.error("❌ [OTP] Error fetching OTP products:", error);
+        setProducts([]);
+        // Removed error toast to prevent lag
       } finally {
         setLoadingProducts(false);
       }
@@ -99,12 +120,11 @@ export default function OtpPage() {
         if (data.order) {
           toast.info(`เลขออเดอร์ OTP ของคุณคือ ${data.order}`, { duration: 4000 });
         }
-      } else {
-        toast.error(data.message || "สั่งซื้อ OTP ไม่สำเร็จ");
       }
+      // Removed error toast to prevent lag
     } catch (error) {
       console.error("Error buying OTP:", error);
-      toast.error("เกิดข้อผิดพลาดในการสั่งซื้อ OTP");
+      // Removed error toast to prevent lag
     } finally {
       setBuying(false);
     }
@@ -135,12 +155,11 @@ export default function OtpPage() {
           statusSms: data.statusSms,
           sms: data.sms,
         });
-      } else {
-        toast.error(data.message || "ไม่สามารถตรวจสอบสถานะ OTP ได้");
       }
+      // Removed error toast to prevent lag
     } catch (error) {
       console.error("Error checking OTP status:", error);
-      toast.error("เกิดข้อผิดพลาดในการตรวจสอบสถานะ OTP");
+      // Removed error toast to prevent lag
     } finally {
       setCheckingStatus(false);
     }

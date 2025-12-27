@@ -16,29 +16,40 @@ const defaultMovies: Movie[] = [
     {
         id: '1',
         title: 'FURIOSA: A MAD MAX SAGA',
-        imageUrl: 'https://img.shibuya24.com/movies/mad_max.webp'
+        imageUrl: '/movies/0.webp'
     },
     {
         id: '2',
         title: 'KINGDOM OF THE PLANET OF THE APES',
-        imageUrl: 'https://img.shibuya24.com/movies/kingdom_of_the_planet_of_the_apes.webp'
+        imageUrl: '/movies/1.webp'
     },
     {
         id: '3',
         title: 'PATTAYA HEAT',
-        imageUrl: 'https://img.shibuya24.com/movies/pattaya_heat.webp'
+        imageUrl: '/movies/3.webp'
     },
     {
         id: '4',
         title: 'THE BEEKEEPER',
-        imageUrl: 'https://img.shibuya24.com/movies/the_beekeeper.webp'
+        imageUrl: '/movies/4.webp'
     },
     {
         id: '5',
         title: 'DEMON SLAYER',
-        imageUrl: 'https://img.shibuya24.com/movies/demon_slayer.webp'
+        imageUrl: '/movies/5.webp'
     }
 ];
+
+// Helper function to convert imageUrl to local folder path
+const getMovieImagePath = (movie: Movie, index: number): string => {
+    // If imageUrl is already a local path (starts with /), use it
+    if (movie.imageUrl && movie.imageUrl.startsWith('/')) {
+        return movie.imageUrl;
+    }
+    // If imageUrl is an external URL (starts with http), convert to local path using index
+    // Otherwise, use index to find image in /movies/ folder
+    return `/movies/${index}.webp`;
+};
 
 export default function MovieRecommendations() {
     // Log immediately when component is called
@@ -82,6 +93,25 @@ export default function MovieRecommendations() {
                     'Cache-Control': 'no-cache'
                 }
             });
+            
+            // Check if response is OK
+            if (!response.ok) {
+                console.error('❌ [MovieRecommendations] API response not OK:', response.status, response.statusText);
+                setMovies(defaultMovies);
+                setLoading(false);
+                return;
+            }
+
+            // Check if response is JSON
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                const text = await response.text();
+                console.error('❌ [MovieRecommendations] Response is not JSON:', text.substring(0, 200));
+                setMovies(defaultMovies);
+                setLoading(false);
+                return;
+            }
+            
             const data = await response.json();
             
             console.log('🎬 [MovieRecommendations] API Response:', {
@@ -178,14 +208,16 @@ export default function MovieRecommendations() {
                             className="w-full"
                         >
                             <CarouselContent className="-ml-2 md:-ml-4">
-                                {displayMovies.map((movie) => {
-                                    console.log('🎬 [MovieRecommendations] Rendering movie:', movie.title);
+                                {displayMovies.map((movie, index) => {
+                                    console.log('🎬 [MovieRecommendations] Rendering movie:', movie.title, 'index:', index, 'original imageUrl:', movie.imageUrl);
+                                    const imagePath = getMovieImagePath(movie, index);
+                                    console.log('🎬 [MovieRecommendations] Using image path:', imagePath);
                                     return (
                                         <CarouselItem key={movie.id} className="pl-2 md:pl-4 basis-[45%] sm:basis-[35%] md:basis-[30%]">
                                             <div className="group relative overflow-hidden rounded-lg border bg-card cursor-pointer hover:shadow-md transition-shadow">
                                                 <div className="aspect-[2/3] relative overflow-hidden">
                                                     <img
-                                                        src={movie.imageUrl}
+                                                        src={imagePath}
                                                         alt={movie.title}
                                                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 select-none"
                                                         draggable={false}
@@ -199,7 +231,16 @@ export default function MovieRecommendations() {
                                                         }}
                                                         onError={(e) => {
                                                             const target = e.target as HTMLImageElement;
-                                                            target.src = '/image-product-app-p.png';
+                                                            // Try fallback with different extensions
+                                                            const currentSrc = target.src;
+                                                            console.warn('🎬 [MovieRecommendations] Image failed to load:', currentSrc, 'for movie:', movie.title);
+                                                            if (currentSrc.endsWith('.webp')) {
+                                                                target.src = currentSrc.replace('.webp', '.jpg');
+                                                            } else if (currentSrc.endsWith('.jpg')) {
+                                                                target.src = currentSrc.replace('.jpg', '.png');
+                                                            } else {
+                                                                target.src = '/image-product-app-p.png';
+                                                            }
                                                         }}
                                                     />
                                                 </div>

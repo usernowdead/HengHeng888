@@ -19,16 +19,37 @@ export default function ServiceTopUpGame() {
     const fetchTopupGames = async () => {
         try {
             const response = await fetch('/api/v1/topup/recommend');
+            
+            // Check if response is OK
+            if (!response.ok) {
+                console.error('❌ [TopupGame] API response not OK:', response.status, response.statusText);
+                setGames([]);
+                setLoading(false);
+                return;
+            }
+
+            // Check if response is JSON
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                const text = await response.text();
+                console.error('❌ [TopupGame] Response is not JSON:', text.substring(0, 200));
+                setGames([]);
+                setLoading(false);
+                return;
+            }
+
             const data = await response.json();
 
             if (data && Array.isArray(data)) {
                 setGames(data);
             } else {
-                toast.error('ไม่สามารถโหลดข้อมูลเกมได้');
+                setGames([]);
             }
+            // Removed error toast to prevent lag
         } catch (error) {
-            console.error('Error fetching topup games:', error);
-            toast.error('เกิดข้อผิดพลาดในการโหลดข้อมูล');
+            console.error('❌ [TopupGame] Error fetching topup games:', error);
+            setGames([]);
+            // Removed error toast to prevent lag
         } finally {
             setLoading(false);
         }

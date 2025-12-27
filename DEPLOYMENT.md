@@ -1,6 +1,6 @@
-# 🚀 Deployment Guide - Oho568
+# 🚀 Deployment Guide - Payplearn
 
-คู่มือการ Deploy โปรเจค Oho568 ไปยัง Vercel และ Supabase
+คู่มือการ Deploy โปรเจค Payplearn ไปยัง Vercel และ Supabase
 
 ---
 
@@ -31,7 +31,7 @@
 
 1. ไปที่ [https://supabase.com](https://supabase.com)
 2. สร้าง New Project
-3. ตั้งชื่อ Project: `oho568` (หรือชื่อที่ต้องการ)
+3. ตั้งชื่อ Project: `payplearn` (หรือชื่อที่ต้องการ)
 4. ตั้ง Password สำหรับ Database (จดไว้!)
 5. เลือก Region: `Southeast Asia (Singapore)` (ใกล้ที่สุด)
 6. กด **Create new project**
@@ -80,7 +80,7 @@ node scripts/create-admin.js
 
 **Default Admin:**
 - Username: `admin`
-- Email: `admin@oho568.com`
+- Email: `admin@payplearn.com`
 - Password: `admin123456` (เปลี่ยนทันทีหลัง login!)
 
 ---
@@ -100,7 +100,7 @@ git add .
 git commit -m "Initial commit - Ready for deployment"
 
 # Create repository on GitHub แล้ว push
-git remote add origin https://github.com/yourusername/oho568.git
+git remote add origin https://github.com/yourusername/payplearn.git
 git branch -M main
 git push -u origin main
 ```
@@ -180,7 +180,7 @@ NEXT_PUBLIC_TURNSTILE_SITE_KEY=your_turnstile_site_key
 1. ไปที่ `https://your-project.vercel.app/admin/website-settings`
 2. Login ด้วย admin account
 3. ตั้งค่า:
-   - ชื่อเว็บไซต์: `Oho568`
+   - ชื่อเว็บไซต์: `Payplearn`
    - Logo URL (ถ้ามี)
    - Announcement
    - อื่นๆ ตามต้องการ

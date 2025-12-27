@@ -126,7 +126,7 @@ export async function POST() {
       await prisma.user.create({
         data: {
           username: 'admin',
-          email: 'admin@oho568.com',
+          email: 'admin@payplearn.com',
           password: hashedPassword,
           role: 1,
           profile: null,

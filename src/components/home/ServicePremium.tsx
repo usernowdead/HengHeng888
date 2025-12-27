@@ -24,17 +24,46 @@ export default function ServicePremium() {
 
     const fetchPremiumServices = async () => {
         try {
-            const response = await fetch('/api/v1/premium/recommend');
-            const data: ApiResponse = await response.json();
+            setLoading(true);
+            const response = await fetch('/api/v1/premium/recommend', {
+                cache: 'no-store',
+                headers: {
+                    'Cache-Control': 'no-cache'
+                }
+            });
 
-            if (data.success) {
+            // Check if response is OK
+            if (!response.ok) {
+                console.error('❌ [ServicePremium] API response not OK:', response.status, response.statusText);
+                const errorText = await response.text();
+                console.error('❌ [ServicePremium] Error response:', errorText.substring(0, 200));
+                throw new Error(`API returned ${response.status}`);
+            }
+
+            // Check if response is JSON
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                const text = await response.text();
+                console.error('❌ [ServicePremium] Response is not JSON:', text.substring(0, 200));
+                throw new Error('Response is not JSON');
+            }
+
+            const data: ApiResponse = await response.json();
+            console.log('✅ [ServicePremium] Fetched services:', data.count, 'services');
+
+            if (data.success && data.services && Array.isArray(data.services)) {
                 setServices(data.services);
+                if (data.services.length === 0) {
+                    console.warn('⚠️ [ServicePremium] No services returned from API');
+                }
             } else {
-                toast.error('ไม่สามารถโหลดข้อมูลบริการได้');
+                console.warn('⚠️ [ServicePremium] API returned success=false or invalid data');
+                setServices([]);
             }
         } catch (error) {
-            console.error('Error fetching premium services:', error);
-            toast.error('เกิดข้อผิดพลาดในการโหลดข้อมูล');
+            console.error('❌ [ServicePremium] Error fetching premium services:', error);
+            setServices([]);
+            // Don't show toast error to avoid spamming user
         } finally {
             setLoading(false);
         }

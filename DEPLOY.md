@@ -1,4 +1,4 @@
-# 🚀 Quick Deploy Guide - Oho568
+# 🚀 Quick Deploy Guide - Payplearn
 
 ## 📦 โฟลเดอร์นี้พร้อม Deploy แล้ว!
 
@@ -20,7 +20,7 @@ cd deploy
 git init
 git add .
 git commit -m "Ready for deployment"
-git remote add origin https://github.com/yourusername/oho568.git
+git remote add origin https://github.com/yourusername/payplearn.git
 git push -u origin main
 ```
 

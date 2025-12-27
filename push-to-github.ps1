@@ -21,9 +21,9 @@ Write-Host "   Username: $username" -ForegroundColor Cyan
 Write-Host "   Email: $email" -ForegroundColor Cyan
 
 # Ask for repository name
-$repoName = Read-Host "`nEnter repository name (default: oho568)"
-if ([string]::IsNullOrWhiteSpace($repoName)) {
-    $repoName = "oho568"
+$repoName = Read-Host "`nEnter repository name (default: payplearn)"
+    if ([string]::IsNullOrWhiteSpace($repoName)) {
+        $repoName = "payplearn"
 }
 
 # Add all files

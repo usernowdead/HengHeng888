@@ -46,6 +46,7 @@ export default function ServicePupSocial() {
                 if (response.status === 401) {
                     console.warn('⚠️ [ServicePupSocial] API Key ไม่ถูกต้องหรือหมดอายุ (401 Unauthorized)')
                     setServices([])
+                    setLoading(false)
                     return
                 }
                 
@@ -53,13 +54,25 @@ export default function ServicePupSocial() {
                 if (response.status >= 500) {
                     console.warn('⚠️ [ServicePupSocial] Server error, returning empty services')
                     setServices([])
+                    setLoading(false)
                     return
                 }
                 
                 // For other errors, just log and return empty
                 console.warn('⚠️ [ServicePupSocial] HTTP error! status:', response.status)
                 setServices([])
+                setLoading(false)
                 return
+            }
+            
+            // Check if response is JSON
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                const text = await response.text();
+                console.error('❌ [ServicePupSocial] Response is not JSON:', text.substring(0, 200));
+                setServices([]);
+                setLoading(false);
+                return;
             }
             
             const data = await response.json()

@@ -20,67 +20,69 @@ export const getPremiumServiceImage = (name: string) => {
 
         // ใช้โลโก้ Netflix ตามที่ต้องการ
         if (lower.includes('netflix') || lower.includes('nf')) {
-            return 'https://playzaa.online/images/apppremium/nf.webp';
+            return '/app/nf.webp';
         }
 
         // Disney
         if (lower.includes('disney')) {
-            return 'https://playzaa.online/images/apppremium/dn.png';
+            // Check if file exists, fallback to default if not
+            return '/app/dn.png';
         }
 
         // VIU
         if (lower.includes('viu')) {
-            return 'https://playzaa.online/images/apppremium/viu.png';
+            return '/app/viu.png';
         }
 
         // YouTube / YT
         if (lower.includes('youtube') || lower.includes('yt')) {
-            return 'https://playzaa.online/images/apppremium/yt.png';
+            // YouTube image may not exist, will fallback via onError
+            return '/app/yt.png';
         }
 
         // Monomax / HBO
         if (lower.includes('monomax') || lower.includes('hbo')) {
-            return 'https://playzaa.online/images/apppremium/hbo.webp';
+            return '/app/hbo.webp';
         }
 
         // TrueID
         if (lower.includes('trueid') || lower.includes('true id')) {
-            return 'https://playzaa.online/images/apppremium/tid.png';
+            return '/app/tid.png';
         }
 
         // CH3
         if (lower.includes('ch3') || lower.includes('ช่อง 3') || lower.includes('channel 3')) {
-            return 'https://playzaa.online/images/apppremium/ch3.webp';
+            return '/app/ch3.webp';
         }
 
         // WeTV
         if (lower.includes('wetv') || lower.includes('we tv')) {
-            return 'https://playzaa.online/images/apppremium/we.webp';
+            return '/app/we.webp';
         }
 
         // Prime Video
         if (lower.includes('prime')) {
-            return 'https://playzaa.online/images/apppremium/pri.png';
+            return '/app/pri.png';
         }
 
         // Youku
         if (lower.includes('youku')) {
-            return 'https://playzaa.online/images/apppremium/yk.webp';
+            return '/app/yk.webp';
         }
 
         // Blibli / BiliBili
         if (lower.includes('blibli') || lower.includes('bilibili')) {
-            return 'https://playzaa.online/images/apppremium/bl.webp';
+            return '/app/bl.webp';
         }
 
         // IQIYI
         if (lower.includes('iqiyi') || lower.includes('iqy') || lower.includes('qiy')) {
-            return 'https://playzaa.online/images/apppremium/iq.png';
+            return '/app/iq.png';
         }
 
         // oneD
         if (lower.includes('oned') || lower.includes('one d')) {
-            return 'https://www.oned.net/_nuxt/oneD_logo_black.BJCu-mC7.png';
+            return '/app/oneD_logo_black.BJCu-mC7.png';
         }
 
         // รูปเริ่มต้น
@@ -113,6 +115,13 @@ export function PremiumServiceCard({ service, onClick }: PremiumServiceCardProps
                 onDragStart={(e) => {
                     e.preventDefault();
                     return false;
+                }}
+                onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    // Fallback to default image if local image fails
+                    if (target.src !== '/image-product-app-p.png') {
+                        target.src = '/image-product-app-p.png';
+                    }
                 }}
             />
             <div className='mt-1.5'>

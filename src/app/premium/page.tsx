@@ -58,16 +58,37 @@ export default function PremiumPage() {
     const fetchPremiumServices = async () => {
         try {
             const response = await fetch('/api/v1/premium');
+            
+            // Check if response is OK
+            if (!response.ok) {
+                console.error('❌ [Premium] API response not OK:', response.status, response.statusText);
+                setAllServices([]);
+                setLoading(false);
+                return;
+            }
+
+            // Check if response is JSON
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                const text = await response.text();
+                console.error('❌ [Premium] Response is not JSON:', text.substring(0, 200));
+                setAllServices([]);
+                setLoading(false);
+                return;
+            }
+
             const data: ApiResponse = await response.json();
 
             if (data.success) {
-                setAllServices(data.services);
+                setAllServices(data.services || []);
             } else {
-                toast.error('ไม่สามารถโหลดข้อมูลบริการได้');
+                setAllServices([]);
             }
+            // Removed error toast to prevent lag
         } catch (error) {
-            console.error('Error fetching premium services:', error);
-            toast.error('เกิดข้อผิดพลาดในการโหลดข้อมูล');
+            console.error('❌ [Premium] Error fetching premium services:', error);
+            setAllServices([]);
+            // Removed error toast to prevent lag
         } finally {
             setLoading(false);
         }

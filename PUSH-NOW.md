@@ -14,7 +14,7 @@
 
 1. ไปที่ [https://github.com/usernowdead](https://github.com/usernowdead)
 2. กด **New Repository** (หรือไปที่ https://github.com/new)
-3. ตั้งชื่อ: `oho568` (หรือชื่อที่ต้องการ)
+3. ตั้งชื่อ: `payplearn` (หรือชื่อที่ต้องการ)
 4. เลือก **Private** (ถ้าต้องการ)
 5. **อย่า** กด "Initialize with README"
 6. กด **Create repository**
@@ -42,7 +42,7 @@ git push -u origin main
 
 1. ไปที่ GitHub → **Settings** → **Developer settings** → **Personal access tokens** → **Tokens (classic)**
 2. กด **Generate new token (classic)**
-3. ตั้งชื่อ: `oho568-deploy`
+3. ตั้งชื่อ: `payplearn-deploy`
 4. เลือก scopes: `repo` (full control)
 5. กด **Generate token**
 6. **คัดลอก token ไว้!** (จะไม่แสดงอีกครั้ง)

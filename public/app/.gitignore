@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+frontend/node_modules/
+
+# Production
+dist/
+build/
+.next/
+frontend/.next/
+frontend/out/
+
+# Environment variables
+.env
+.env.local
+.env*.local
+
+# Rust
+target/
+Cargo.lock
+backend/target/
+backend/Cargo.lock
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+

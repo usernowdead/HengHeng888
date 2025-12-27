@@ -136,118 +136,94 @@ export function TopupGameCard({ game, onClick }: TopupGameCardProps) {
     const getGameImage = (gameName: string, gameKey?: string) => {
         const name = gameName.toLowerCase();
         
-        // Game name to image file mapping (specific mappings for known games)
+        // Game name to image file mapping (all paths use /GAME/ folder)
         const gameImageMap: Record<string, string> = {
             // Valorant
-            'valorant': 'https://img5.pic.in.th/file/secure-sv1/202411162114373GUYTE6BVGEZF6USJJ5KCAVTBNRXXEYLOOQQDCOJNHEWTEMBSGI.png',
+            'valorant': '/GAME/202411162114373GUYTE6BVGEZF6USJJ5KCAVTBNRXXEYLOOQQDCOJNHEWTEMBSGI======.png',
             
             // Arena Breakout
-            'arena breakout': 'https://img2.pic.in.th/pic/arena-breakout-new.jpg',
-            'arena breakout infinite': 'https://img5.pic.in.th/file/secure-sv1/arena-breakout-infinite.png',
+            'arena breakout': '/GAME/arena-breakout-new.jpg',
+            'arena breakout infinite': '/GAME/arena-breakout-infinite.png',
             
             // Call of Duty
-            'call of duty': 'https://img2.pic.in.th/pic/call-of-duty-m.png',
-            'call of duty mobile': 'https://img2.pic.in.th/pic/call-of-duty-m.png',
-            'cod': 'https://img2.pic.in.th/pic/call-of-duty-m.png',
-            'codm': 'https://img2.pic.in.th/pic/call-of-duty-m.png',
+            'call of duty': '/GAME/call-of-duty-m.png',
+            'call of duty mobile': '/GAME/call-of-duty-m.png',
+            'cod': '/GAME/call-of-duty-m.png',
+            'codm': '/GAME/call-of-duty-m.png',
             
             // Delta Force
-            'delta force': 'https://img2.pic.in.th/pic/delta-force-garena.png',
-            'delta force garena': 'https://img2.pic.in.th/pic/delta-force-garena.png',
-            'delta force steam': 'https://img5.pic.in.th/file/secure-sv1/delta-force-steam.jpg',
+            'delta force': '/GAME/delta-force-garena.png',
+            'delta force garena': '/GAME/delta-force-garena.png',
+            'delta force steam': '/GAME/delta-force-steam.jpg',
             
             // Dragon Nest
-            'dragon nest': 'https://img5.pic.in.th/file/secure-sv1/dragon-nest-m-classic.jpg',
-            'dragon nest m': 'https://img5.pic.in.th/file/secure-sv1/dragon-nest-m-classic.jpg',
-            
-            // Dragon Raja
-            'dragon raja': 'https://img5.pic.in.th/file/secure-sv1/202411162105099Dragon-Raja.png',
+            'dragon nest': '/GAME/dragon-nest-m-classic.jpg',
+            'dragon nest m': '/GAME/dragon-nest-m-classic.jpg',
             
             // Free Fire
-            'free fire': 'https://img5.pic.in.th/file/secure-sv1/free-fire-new.jpg',
-            'freefire': 'https://img5.pic.in.th/file/secure-sv1/free-fire-new.jpg',
-            'ff': 'https://img5.pic.in.th/file/secure-sv1/free-fire-new.jpg',
+            'free fire': '/GAME/free-fire-new.jpg',
+            'freefire': '/GAME/free-fire-new.jpg',
+            'ff': '/GAME/free-fire-new.jpg',
             
             // Haikyu
-            'haikyu': 'https://img5.pic.in.th/file/secure-sv1/haikyu-flyhigh.png',
-            'haikyu fly high': 'https://img5.pic.in.th/file/secure-sv1/haikyu-flyhigh.png',
+            'haikyu': '/GAME/haikyu-flyhigh.png',
+            'haikyu fly high': '/GAME/haikyu-flyhigh.png',
             
             // League of Legends
-            'league of legends': 'https://img2.pic.in.th/pic/league-of-legends-new.jpg',
-            'lol': 'https://img2.pic.in.th/pic/league-of-legends-new.jpg',
-            'wild rift': 'https://img2.pic.in.th/pic/lol_wild_rift_logo.jpeg',
-            'lol wild rift': 'https://img2.pic.in.th/pic/lol_wild_rift_logo.jpeg',
+            'league of legends': '/GAME/league-of-legends-new.jpg',
+            'lol': '/GAME/league-of-legends-new.jpg',
+            'wild rift': '/GAME/lol_wild_rift_logo.jpeg',
+            'lol wild rift': '/GAME/lol_wild_rift_logo.jpeg',
             
             // Lord Nine
-            'lord nine': 'https://img2.pic.in.th/pic/lord-nine.png',
+            'lord nine': '/GAME/lord-nine.png',
             
             // Magic Chess
-            'magic chess': 'https://img5.pic.in.th/file/secure-sv1/magic-chess-go-go.jpg',
-            'magic chess go go': 'https://img5.pic.in.th/file/secure-sv1/magic-chess-go-go.jpg',
+            'magic chess': '/GAME/magic-chess-go-go.jpg',
+            'magic chess go go': '/GAME/magic-chess-go-go.jpg',
             
             // Mobile Legends
-            'mobile legends': 'https://img5.pic.in.th/file/secure-sv1/mobile_legends_logo.jpg',
-            'mobile legends bang bang': 'https://img5.pic.in.th/file/secure-sv1/mobile_legends_logo.jpg',
-            'ml': 'https://img5.pic.in.th/file/secure-sv1/mobile_legends_logo.jpg',
-            'mlbb': 'https://img5.pic.in.th/file/secure-sv1/mobile_legends_logo.jpg',
+            'mobile legends': '/GAME/mobile_legends_logo.jpg',
+            'mobile legends bang bang': '/GAME/mobile_legends_logo.jpg',
+            'ml': '/GAME/mobile_legends_logo.jpg',
+            'mlbb': '/GAME/mobile_legends_logo.jpg',
             
             // PUBG Mobile
-            'pubg': 'https://img2.pic.in.th/pic/pubg-mobile-new.jpg',
-            'pubg mobile': 'https://img2.pic.in.th/pic/pubg-mobile-new.jpg',
-            'pubg mobile global': 'https://img5.pic.in.th/file/secure-sv1/pubg-mobile-global-newfaaab32af0304a06.jpg',
-            'battlegrounds': 'https://img2.pic.in.th/pic/pubg-mobile-new.jpg',
+            'pubg': '/GAME/pubg-mobile-new.jpg',
+            'pubg mobile': '/GAME/pubg-mobile-new.jpg',
+            'pubg mobile global': '/GAME/pubg-mobile-global-new.jpg',
+            'battlegrounds': '/GAME/pubg-mobile-new.jpg',
             
             // Racing Master
             'racing master': '/GAME/racing-master.jpg',
             
             // Ragnarok
-            'ragnarok': 'https://img5.pic.in.th/file/secure-sv1/ragnarok-m-classic.jpg',
-            'ragnarok m': 'https://img5.pic.in.th/file/secure-sv1/ragnarok-m-classic.jpg',
-            'ro': 'https://img5.pic.in.th/file/secure-sv1/ragnarok-m-classic.jpg',
+            'ragnarok': '/GAME/ragnarok-m-classic.jpg',
+            'ragnarok m': '/GAME/ragnarok-m-classic.jpg',
+            'ro': '/GAME/ragnarok-m-classic.jpg',
             
             // Roblox
-            'roblox': 'https://img2.pic.in.th/pic/roblox2a1bc020c3f657a8.png',
+            'roblox': '/GAME/roblox.png',
             
             // ROV (Arena of Valor)
-            'rov': 'https://img2.pic.in.th/pic/20221128063554987_rov_mobile_appicon.png',
-            'arena of valor': 'https://img2.pic.in.th/pic/20221128063554987_rov_mobile_appicon.png',
-            'aov': 'https://img2.pic.in.th/pic/20221128063554987_rov_mobile_appicon.png',
+            'rov': '/GAME/20221128063554987_rov_mobile_appicon.png',
+            'arena of valor': '/GAME/20221128063554987_rov_mobile_appicon.png',
+            'aov': '/GAME/20221128063554987_rov_mobile_appicon.png',
             
             // Sword of Justice
-            'sword of justice': 'https://img5.pic.in.th/file/secure-sv1/sword-of-justice.jpg',
+            'sword of justice': '/GAME/sword-of-justice.jpg',
             
             // Teamfight Tactics
-            'teamfight tactics': 'https://img2.pic.in.th/pic/teamfight-tactics-mobile-new.jpg',
-            'tft': 'https://img2.pic.in.th/pic/teamfight-tactics-mobile-new.jpg',
-            'tft mobile': 'https://img2.pic.in.th/pic/teamfight-tactics-mobile-new.jpg',
+            'teamfight tactics': '/GAME/teamfight-tactics-mobile-new.jpg',
+            'tft': '/GAME/teamfight-tactics-mobile-new.jpg',
+            'tft mobile': '/GAME/teamfight-tactics-mobile-new.jpg',
             
             // Where Winds Meet
-            'where winds meet': 'https://img2.pic.in.th/pic/where-winds-meet.jpg',
+            'where winds meet': '/GAME/where-winds-meet.jpg',
             
             // Cabal
-            'cabal': 'https://img5.pic.in.th/file/secure-sv1/202411162132482Cabal-infinite-combo-TH.png',
-            'cabal infinite combo': 'https://img5.pic.in.th/file/secure-sv1/202411162132482Cabal-infinite-combo-TH.png',
-            
-            // Eggy Party
-            'eggy party': 'https://img2.pic.in.th/pic/202411162108236Eggy-Party-1.png',
-            
-            // FC Mobile
-            'fc mobile': 'https://img5.pic.in.th/file/secure-sv1/fc-mobile.jpg',
-            
-            // Dunk City Dynasty
-            'dunk city dynasty': 'https://img5.pic.in.th/file/secure-sv1/dunk-city-dynasty.jpg',
-            
-            // Draconia Saga
-            'draconia saga': 'https://img2.pic.in.th/pic/draconia-saga011c35ad34b74f01.jpg',
-            
-            // Blood Strike
-            'blood strike': 'https://img2.pic.in.th/pic/blood-strike.jpg',
-            
-            // AFK Journey
-            'afk journey': 'https://img5.pic.in.th/file/secure-sv1/afk-journey.jpg',
-            
-            // Genshin Impact
-            'genshin impact': 'https://img2.pic.in.th/pic/genshin-impact-new.jpg',
+            'cabal': '/GAME/202411162132482Cabal infinite combo (TH).png',
+            'cabal infinite combo': '/GAME/202411162132482Cabal infinite combo (TH).png',
         };
         
         // Try exact match first

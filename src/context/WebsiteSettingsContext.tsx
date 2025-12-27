@@ -27,7 +27,7 @@ interface WebsiteSettingsProviderProps {
 export const WebsiteSettingsProvider: React.FC<WebsiteSettingsProviderProps> = ({ children }) => {
     // Initialize with default to prevent hydration mismatch
     const [settings, setSettings] = useState<WebsiteSettingsData | null>({
-        websiteName: 'Oho568',
+        websiteName: 'Payplearn',
         logoUrl: '',
         announcement: '',
         shopDescription: '',
@@ -51,17 +51,37 @@ export const WebsiteSettingsProvider: React.FC<WebsiteSettingsProviderProps> = (
             const response = await fetch('/api/v1/website-settings', {
                 cache: 'no-store', // Force fresh data
             });
+            
+            // Check if response is OK
+            if (!response.ok) {
+                console.error('❌ [WebsiteSettings] API response not OK:', response.status, response.statusText);
+                // Keep default settings, don't set error
+                setLoading(false);
+                return;
+            }
+
+            // Check if response is JSON
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                const text = await response.text();
+                console.error('❌ [WebsiteSettings] Response is not JSON:', text.substring(0, 200));
+                // Keep default settings, don't set error
+                setLoading(false);
+                return;
+            }
+            
             const data = await response.json();
 
             if (data.success) {
                 // API returns { success: true, settings: {...} }
                 setSettings(data.settings || data.data);
             } else {
-                setError(data.message || 'ไม่สามารถโหลดข้อมูลได้');
+                // Keep default settings, don't set error to prevent UI issues
+                console.warn('⚠️ [WebsiteSettings] API returned success=false');
             }
         } catch (err) {
-            console.error('Error fetching website settings:', err);
-            setError('เกิดข้อผิดพลาดในการโหลดข้อมูล');
+            console.error('❌ [WebsiteSettings] Error fetching website settings:', err);
+            // Keep default settings, don't set error to prevent UI issues
         } finally {
             setLoading(false);
         }

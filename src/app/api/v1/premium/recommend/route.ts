@@ -73,6 +73,8 @@ async function fetchPeamsubServices() {
 
 export async function GET(request: NextRequest) {
     try {
+        console.log('📦 [Premium Recommend API] Starting fetch...');
+        
         // Get provider settings
         const settings = await getWebsiteSettings();
         const gafiwEnabled = settings['premium_provider_gafiw_enabled'] !== false && settings['premium_provider_gafiw_enabled'] !== 'false';
@@ -82,18 +84,36 @@ export async function GET(request: NextRequest) {
         const useGafiw = gafiwEnabled || (!gafiwEnabled && !peamsubEnabled);
         const usePeamsub = peamsubEnabled;
 
+        console.log('📦 [Premium Recommend API] Provider settings:', { useGafiw, usePeamsub });
+
         const allServices: any[] = [];
 
         // Fetch from enabled providers
         if (useGafiw) {
-            const gafiwServices = await fetchGafiwServices();
-            allServices.push(...gafiwServices);
+            console.log('📦 [Premium Recommend API] Fetching from Gafiw...');
+            try {
+                const gafiwServices = await fetchGafiwServices();
+                console.log('✅ [Premium Recommend API] Gafiw services:', gafiwServices.length);
+                allServices.push(...gafiwServices);
+            } catch (error) {
+                console.error('❌ [Premium Recommend API] Gafiw fetch error:', error);
+                // Continue with other providers
+            }
         }
 
         if (usePeamsub) {
-            const peamsubServices = await fetchPeamsubServices();
-            allServices.push(...peamsubServices);
+            console.log('📦 [Premium Recommend API] Fetching from Peamsub...');
+            try {
+                const peamsubServices = await fetchPeamsubServices();
+                console.log('✅ [Premium Recommend API] Peamsub services:', peamsubServices.length);
+                allServices.push(...peamsubServices);
+            } catch (error) {
+                console.error('❌ [Premium Recommend API] Peamsub fetch error:', error);
+                // Continue with other providers
+            }
         }
+
+        console.log('📦 [Premium Recommend API] Total services fetched:', allServices.length);
 
         // Shuffle array for random recommendations
         for (let i = allServices.length - 1; i > 0; i--) {
@@ -103,20 +123,36 @@ export async function GET(request: NextRequest) {
 
         const recommendedServices = allServices.slice(0, 10);
 
+        console.log('✅ [Premium Recommend API] Returning', recommendedServices.length, 'recommended services');
+
         return NextResponse.json({
             success: true,
             services: recommendedServices,
             count: recommendedServices.length
+        }, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Cache-Control': 'no-store, no-cache, must-revalidate'
+            }
         });
     } catch (error: any) {
-        if (process.env.NODE_ENV === 'development') {
-            console.error('Premium recommend error:', error?.response?.status, error?.message);
-        }
+        console.error('❌ [Premium Recommend API] Error:', {
+            message: error?.message,
+            status: error?.response?.status,
+            stack: error?.stack
+        });
         
+        // Return empty array instead of error to prevent frontend crash
         return NextResponse.json({
             success: false,
             services: [],
-            count: 0
-        }, { status: 500 });
+            count: 0,
+            error: process.env.NODE_ENV === 'development' ? error?.message : undefined
+        }, { 
+            status: 200, // Return 200 with success:false instead of 500
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
     }
 }

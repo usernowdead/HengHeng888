@@ -11,7 +11,7 @@ export default function Footer() {
                 <div className='py-4 text-center'>
                     <Link href={'/'} className='inline-block'>
                         <h2 className='text-base font-semibold mb-2' suppressHydrationWarning>
-                            Oho568
+                            Payplearn
                         </h2>
                     </Link>
                     <p className='text-xs text-gray-600'>
@@ -23,7 +23,7 @@ export default function Footer() {
                 <div className='border-t border-gray-200 py-3'>
                     <div className='flex flex-col items-center gap-2 text-center'>
                         <p className='text-xs text-gray-500' suppressHydrationWarning>
-                            ลิขสิทธิ์ © {currentYear} <span suppressHydrationWarning>Oho568</span> สงวนลิขสิทธิ์ทุกประการ
+                            ลิขสิทธิ์ © {currentYear} <span suppressHydrationWarning>Payplearn</span> สงวนลิขสิทธิ์ทุกประการ
                         </p>
                         <div className='flex items-center justify-center gap-2'>
                             <Link 

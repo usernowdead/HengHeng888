@@ -21,7 +21,7 @@ export default function ContactUs() {
 
                 <div className='px-3 py-3'>
                     <Link
-                        href='https://line.me/ti/p/~Oho568'
+                        href='https://line.me/ti/p/~Payplearn'
                         target="_blank"
                         rel="noopener noreferrer"
                     >
@@ -48,7 +48,7 @@ export default function ContactUs() {
                             </div>
                             <div className="flex-1 min-w-0">
                                 <p className="text-sm font-medium line-clamp-1">
-                                    Oho568
+                                    Payplearn
                                 </p>
                                 <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">
                                     ช่องทางการติดต่อคอลเซ็นเตอร์
